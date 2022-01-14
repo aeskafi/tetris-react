@@ -14,13 +14,12 @@ export const BG_COLOR = "#ecf4cb"
 export const GRID_SPACE = 30
 export const GAME_EDGE_LEFT = 150
 export const GAME_EDGE_RIGHT = 450
+export const CURRENT_SCORE = 0
+export const CURRENT_LEVEL = 1
+export const LINES_CLEARED = 0
 // var gridPieces = [];
 // var lineFades = [];
 // var gridWorkers = [];
-
-// var currentScore = 0;
-// var currentLevel = 1;
-// var linesCleared = 0;
 
 // var ticks = 0;
 // var updateEvery = 15;
