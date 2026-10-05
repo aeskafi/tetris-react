@@ -130,60 +130,6 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   Virtual D-Pad (Touch / Mobile)
-   -------------------------------------------------------------------------- */
-.virtual-dpad {
-  margin-top: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.dpad-row {
-  display: flex;
-  gap: 8px;
-}
-
-.dpad-btn {
-  width: 54px;
-  height: 48px;
-  background: #1f2937;
-  color: #e5e7eb;
-  border: 1px solid rgba(75, 85, 99, 0.4);
-  border-radius: 8px;
-  font-size: 19px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: all 0.1s ease;
-}
-
-.dpad-btn:hover {
-  background: #374151;
-}
-
-.dpad-btn:active {
-  transform: scale(0.92);
-  background: #4f46e5;
-  color: white;
-}
-
-.dpad-btn.drop-btn {
-  background: #7c2d12;
-  color: #fdba74;
-  border-color: #ea580c;
-}
-
-.dpad-btn.drop-btn:active {
-  background: #ea580c;
-  color: white;
-}
-
-/* --------------------------------------------------------------------------
    Footer Instructions
    -------------------------------------------------------------------------- */
 .tetris-footer {
@@ -214,11 +160,5 @@ kbd {
     gap: 8px;
     align-items: center;
     text-align: center;
-  }
-
-  .dpad-btn {
-    width: 48px;
-    height: 44px;
-    font-size: 17px;
   }
 }

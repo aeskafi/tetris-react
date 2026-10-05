@@ -72,6 +72,12 @@ const MainBoard = () => {
     }, []);
 
     const keyPressed = useCallback((event) => {
+        if (
+            [32, 37, 38, 39, 40].includes(event.keyCode) ||
+            ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)
+        ) {
+            event.preventDefault();
+        }
         sendInput(event.keyCode);
     }, [sendInput]);
 
@@ -182,7 +188,7 @@ const MainBoard = () => {
         // Left side controls guide
         p5.fill(25);
         p5.noStroke();
-        p5.rect(0, 0, GAME_EDGE_LEFT, CANVAS_SIZE[0]);
+        p5.rect(0, 0, GAME_EDGE_LEFT, CANVAS_SIZE[1]);
 
         p5.textAlign('center');
         p5.fill(255);
@@ -192,19 +198,41 @@ const MainBoard = () => {
     };
 
     const drawGameOver = (p5) => {
-        p5.fill(DARK_COLOR);
-        p5.textSize(54);
+        p5.push();
+        p5.fill(11, 15, 25, 225);
+        p5.noStroke();
+        p5.rect(GAME_EDGE_LEFT, 0, GAME_EDGE_RIGHT - GAME_EDGE_LEFT, CANVAS_SIZE[1]);
+
+        p5.fill(239, 68, 68);
+        p5.textSize(48);
+        p5.textStyle(p5.BOLD);
         p5.textAlign('center');
-        p5.text('Game\nOver!', 300, 250);
-        p5.textSize(20);
-        p5.text('Press R to Restart', 300, 360);
+        p5.text('GAME\nOVER', 300, 230);
+
+        p5.fill(243, 244, 246);
+        p5.textSize(16);
+        p5.textStyle(p5.NORMAL);
+        p5.text('Press R or New Game', 300, 340);
+        p5.pop();
     };
 
     const drawPaused = (p5) => {
-        p5.fill(DARK_COLOR);
-        p5.textSize(48);
+        p5.push();
+        p5.fill(11, 15, 25, 210);
+        p5.noStroke();
+        p5.rect(GAME_EDGE_LEFT, 0, GAME_EDGE_RIGHT - GAME_EDGE_LEFT, CANVAS_SIZE[1]);
+
+        p5.fill(129, 140, 248);
+        p5.textSize(44);
+        p5.textStyle(p5.BOLD);
         p5.textAlign('center');
-        p5.text('PAUSED', 300, 260);
+        p5.text('PAUSED', 300, 250);
+
+        p5.fill(243, 244, 246);
+        p5.textSize(16);
+        p5.textStyle(p5.NORMAL);
+        p5.text('Press P to Resume', 300, 310);
+        p5.pop();
     };
 
     const setup = (p5, canvasParentRef) => {
@@ -218,12 +246,6 @@ const MainBoard = () => {
     const draw = (p5) => {
         drawRight(p5);
         drawLeft(p5);
-
-        if (gameOver) {
-            drawGameOver(p5);
-        } else if (pauseGame) {
-            drawPaused(p5);
-        }
 
         if (FALLING_PIECE) {
             FALLING_PIECE.show();
@@ -249,6 +271,12 @@ const MainBoard = () => {
 
         if (GRID_WORKERS.length > 0) {
             GRID_WORKERS[0].work();
+        }
+
+        if (gameOver) {
+            drawGameOver(p5);
+        } else if (pauseGame) {
+            drawPaused(p5);
         }
     };
 
@@ -665,42 +693,6 @@ const MainBoard = () => {
             {/* Canvas Card */}
             <div className="canvas-card">
                 <Sketch setup={setup} draw={draw} />
-            </div>
-
-            {/* Virtual Directional D-Pad for Mobile */}
-            <div className="virtual-dpad">
-                <div className="dpad-row">
-                    <button
-                        className="dpad-btn up"
-                        onClick={() => sendInput(38)}
-                        aria-label="Rotate Block"
-                    >
-                        ↻
-                    </button>
-                </div>
-                <div className="dpad-row">
-                    <button
-                        className="dpad-btn left"
-                        onClick={() => sendInput(37)}
-                        aria-label="Move Left"
-                    >
-                        ◀
-                    </button>
-                    <button
-                        className="dpad-btn down"
-                        onClick={() => sendInput(40)}
-                        aria-label="Soft Drop"
-                    >
-                        ▼
-                    </button>
-                    <button
-                        className="dpad-btn right"
-                        onClick={() => sendInput(39)}
-                        aria-label="Move Right"
-                    >
-                        ▶
-                    </button>
-                </div>
             </div>
 
             {/* Navigation hints */}

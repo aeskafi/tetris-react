@@ -14,21 +14,21 @@
 - **Classic Arcade Physics**: Authentic 10×20 block grid with full 7-tetromino rotation matrix (I, J, L, O, S, T, Z) and soft-drop mechanics.
 - **Procedural Web Audio Engine**: Zero-asset, zero-latency retro sound effects (move, rotate, hard-drop, multi-line clear, game over) and an 8-bit procedural arcade BGM track synthesized entirely in code.
 - **Persistent High Scores**: Automatically saves and updates your personal best to browser `localStorage`.
-- **Responsive Mobile D-Pad**: Touch-optimized virtual directional keypad alongside desktop keyboard controls (`←`, `→`, `↑`, `↓`, `P`, `R`).
-- **Dynamic Viewport Scaling**: Responsive CSS and canvas scaling ensure crisp rendering on mobile screens, tablets, and desktop displays without layout clipping.
+- **Keyboard Navigation & Scroll-Lock**: Smooth controls with default browser scroll-locking on directional inputs.
+- **Dynamic Viewport Scaling**: Responsive CSS and canvas scaling ensure crisp rendering across desktop and mobile screens.
 - **Audio Toolbar & Controls**: Instant mute/unmute toggle, pause/resume, and instant new game resets.
 
 ---
 
 ## 🎮 Controls
 
-| Action | Keyboard | Mobile D-Pad |
-|---|---|---|
-| **Move Left / Right** | `←` / `→` or `A` / `D` | ◀ / ▶ |
-| **Rotate Piece** | `↑` or `W` | ↻ |
-| **Soft Drop** | `↓` or `S` | ▼ |
-| **Pause / Resume** | `P` | Pause Button |
-| **Restart Game** | `R` | New Game Button |
+| Action | Keyboard / Button |
+|---|---|
+| **Move Left / Right** | `←` / `→` or `A` / `D` |
+| **Rotate Piece** | `↑`, `W`, or `Space` |
+| **Soft Drop** | `↓` or `S` |
+| **Pause / Resume** | `P` or Pause Button |
+| **Restart Game** | `R` or New Game Button |
 
 ---
 
