@@ -31,7 +31,6 @@ try {
 
 let GRID_PIECES = [];
 let LINE_FADES = [];
-let GRID_WORKERS = [];
 
 let TICKS = 0;
 let UPDATE_EVERY = 15;
@@ -60,8 +59,8 @@ const MainBoard = () => {
             return;
         }
 
-        if (keyCode === 80) {
-            // 'P' key toggles pause
+        if (keyCode === 80 || keyCode === 27) {
+            // 'P' or 'Escape' key toggles pause
             togglePause();
             return;
         }
@@ -73,8 +72,8 @@ const MainBoard = () => {
 
     const keyPressed = useCallback((event) => {
         if (
-            [32, 37, 38, 39, 40].includes(event.keyCode) ||
-            ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)
+            [27, 32, 37, 38, 39, 40].includes(event.keyCode) ||
+            ['Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)
         ) {
             event.preventDefault();
         }
@@ -105,7 +104,6 @@ const MainBoard = () => {
         LINES_CLEARED = 0;
         GRID_PIECES = [];
         LINE_FADES = [];
-        GRID_WORKERS = [];
         TICKS = 0;
         UPDATE_EVERY_CURRENT = 15;
         UPDATE_EVERY = 15;
@@ -194,7 +192,7 @@ const MainBoard = () => {
         p5.fill(255);
         p5.noStroke();
         p5.textSize(13);
-        p5.text('CONTROLS:\n\n← → : Move\n↑ / Space : Rotate\n↓ : Soft Drop\n\nP : Pause\nR : Restart', 75, 180);
+        p5.text('CONTROLS:\n\n← → : Move\n↑ / Space : Rotate\n↓ : Soft Drop\n\nP / ESC : Pause\nR : Restart', 75, 180);
     };
 
     const drawGameOver = (p5) => {
@@ -265,12 +263,11 @@ const MainBoard = () => {
             GRID_PIECES[i].show();
         }
 
-        for (let i = 0; i < LINE_FADES.length; i++) {
+        for (let i = LINE_FADES.length - 1; i >= 0; i--) {
             LINE_FADES[i].show();
-        }
-
-        if (GRID_WORKERS.length > 0) {
-            GRID_WORKERS[0].work();
+            if (LINE_FADES[i].finished) {
+                LINE_FADES.splice(i, 1);
+            }
         }
 
         if (gameOver) {
@@ -281,22 +278,22 @@ const MainBoard = () => {
     };
 
     class lineBar {
-        constructor(p5, y, index) {
+        constructor(p5, y) {
             this.pos = new p5.createVector(GAME_EDGE_LEFT, y);
             this.width = GAME_EDGE_RIGHT - GAME_EDGE_LEFT;
-            this.index = index;
+            this.opacity = 255;
+            this.finished = false;
 
             this.show = function () {
-                p5.fill(255);
+                p5.push();
+                p5.fill(255, 255, 255, this.opacity);
                 p5.noStroke();
                 p5.rect(this.pos.x, this.pos.y, this.width, GRID_SPACE);
+                p5.pop();
 
-                if (this.width + this.pos.x > this.pos.x) {
-                    this.width -= 10;
-                    this.pos.x += 5;
-                } else {
-                    LINE_FADES.splice(this.index, 1);
-                    GRID_WORKERS.push(new worker(this.pos.y, GRID_SPACE));
+                this.opacity -= 40;
+                if (this.opacity <= 0) {
+                    this.finished = true;
                 }
             };
         }
@@ -499,10 +496,12 @@ const MainBoard = () => {
 
             this.commitShape = function () {
                 for (let i = 0; i < this.pieces.length; i++) {
+                    this.pieces[i].pos.x = Math.round(this.pieces[i].pos.x / GRID_SPACE) * GRID_SPACE;
+                    this.pieces[i].pos.y = Math.round(this.pieces[i].pos.y / GRID_SPACE) * GRID_SPACE;
                     GRID_PIECES.push(this.pieces[i]);
                 }
-                this.resetPiece(p5);
                 analyzeGrid(p5);
+                this.resetPiece(p5);
             };
         }
     }
@@ -538,27 +537,39 @@ const MainBoard = () => {
     }
 
     function analyzeGrid(p5) {
-        let linesCount = 0;
-        let score = 0;
-        while (checkLines(p5)) {
-            linesCount += 1;
-            score += 100;
-            LINES_CLEARED += 1;
-            if (LINES_CLEARED % 10 === 0) {
-                CURRENT_LEVEL += 1;
-                if (UPDATE_EVERY_CURRENT > 4) {
-                    UPDATE_EVERY_CURRENT -= 1;
-                }
+        // Snap all pieces to grid and count blocks per row Y
+        const rowCounts = {};
+        for (let i = 0; i < GRID_PIECES.length; i++) {
+            const roundedY = Math.round(GRID_PIECES[i].pos.y / GRID_SPACE) * GRID_SPACE;
+            const roundedX = Math.round(GRID_PIECES[i].pos.x / GRID_SPACE) * GRID_SPACE;
+            GRID_PIECES[i].pos.y = roundedY;
+            GRID_PIECES[i].pos.x = roundedX;
+
+            rowCounts[roundedY] = (rowCounts[roundedY] || 0) + 1;
+        }
+
+        // Find all full rows (10 blocks per row across the 300px playfield)
+        const fullRows = [];
+        for (const [yStr, count] of Object.entries(rowCounts)) {
+            if (count >= 10) {
+                fullRows.push(Number(yStr));
             }
         }
-        if (score > 100) {
-            score *= 2;
-        }
-        CURRENT_SCORE += score;
 
-        if (linesCount > 0) {
-            sound.playLineClear(linesCount);
+        if (fullRows.length === 0) {
+            return;
         }
+
+        const linesCount = fullRows.length;
+        LINES_CLEARED += linesCount;
+        CURRENT_LEVEL = Math.floor(LINES_CLEARED / 10) + 1;
+        UPDATE_EVERY_CURRENT = Math.max(4, 15 - (CURRENT_LEVEL - 1));
+        UPDATE_EVERY = UPDATE_EVERY_CURRENT;
+
+        // Classic arcade score multipliers: 1=100, 2=300, 3=500, 4=800
+        const lineScores = [0, 100, 300, 500, 800];
+        const addedScore = (lineScores[Math.min(linesCount, 4)] || linesCount * 200) * CURRENT_LEVEL;
+        CURRENT_SCORE += addedScore;
 
         if (CURRENT_SCORE > HIGH_SCORE) {
             HIGH_SCORE = CURRENT_SCORE;
@@ -566,49 +577,30 @@ const MainBoard = () => {
                 localStorage.setItem('tetris_high_score', HIGH_SCORE.toString());
             } catch (e) {}
         }
-    }
 
-    function checkLines(p5) {
-        let count = 0;
-        let runningY = -1;
-        let runningIndex = -1;
+        // Trigger flash beam on cleared rows
+        for (const rowY of fullRows) {
+            LINE_FADES.push(new lineBar(p5, rowY));
+        }
 
-        GRID_PIECES.sort((a, b) => (a.pos.y !== b.pos.y ? a.pos.y - b.pos.y : a.pos.x - b.pos.x));
+        // 1. Remove blocks belonging to cleared full rows
+        GRID_PIECES = GRID_PIECES.filter((piece) => !fullRows.includes(piece.pos.y));
 
+        // 2. Drop all remaining blocks above cleared rows by GRID_SPACE * (cleared rows beneath them)
         for (let i = 0; i < GRID_PIECES.length; i++) {
-            if (GRID_PIECES[i].pos.y === runningY) {
-                count++;
-                if (count === 10) {
-                    GRID_PIECES.splice(runningIndex, 10);
-                    LINE_FADES.push(new lineBar(p5, runningY, LINE_FADES.length));
-                    return true;
+            const pieceY = GRID_PIECES[i].pos.y;
+            let dropCount = 0;
+            for (let r = 0; r < fullRows.length; r++) {
+                if (fullRows[r] > pieceY) {
+                    dropCount++;
                 }
-            } else {
-                runningY = GRID_PIECES[i].pos.y;
-                count = 1;
-                runningIndex = i;
+            }
+            if (dropCount > 0) {
+                GRID_PIECES[i].pos.y += dropCount * GRID_SPACE;
             }
         }
-        return false;
-    }
 
-    class worker {
-        constructor(y, amount) {
-            this.amountY = amount;
-            this.targetY = y;
-
-            this.work = function () {
-                for (let i = 0; i < GRID_PIECES.length; i++) {
-                    if (GRID_PIECES[i].pos.y < this.targetY) {
-                        GRID_PIECES[i].pos.y += 5;
-                    }
-                }
-                this.amountY -= 5;
-                if (this.amountY <= 0) {
-                    GRID_WORKERS.shift();
-                }
-            };
-        }
+        sound.playLineClear(linesCount);
     }
 
     function orientPoints(pieceType, rotation) {
@@ -699,7 +691,7 @@ const MainBoard = () => {
             <footer className="tetris-footer">
                 <p>
                     💡 <kbd>←</kbd> <kbd>→</kbd> Move • <kbd>↑</kbd> Rotate •{' '}
-                    <kbd>↓</kbd> Soft Drop • <kbd>P</kbd> Pause • <kbd>R</kbd> Restart
+                    <kbd>↓</kbd> Soft Drop • <kbd>P</kbd> / <kbd>Esc</kbd> Pause • <kbd>R</kbd> Restart
                 </p>
             </footer>
         </div>

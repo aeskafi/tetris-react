@@ -27,7 +27,7 @@
 | **Move Left / Right** | `←` / `→` or `A` / `D` |
 | **Rotate Piece** | `↑`, `W`, or `Space` |
 | **Soft Drop** | `↓` or `S` |
-| **Pause / Resume** | `P` or Pause Button |
+| **Pause / Resume** | `P` / `Esc` or Pause Button |
 | **Restart Game** | `R` or New Game Button |
 
 ---
