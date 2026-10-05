@@ -15,6 +15,7 @@
 - **Procedural Web Audio Engine**: Zero-asset, zero-latency retro sound effects (move, rotate, hard-drop, multi-line clear, game over) and an 8-bit procedural arcade BGM track synthesized entirely in code.
 - **Persistent High Scores**: Automatically saves and updates your personal best to browser `localStorage`.
 - **Keyboard Navigation & Scroll-Lock**: Smooth controls with default browser scroll-locking on directional inputs.
+- **Progressive Speed Scaling**: Authentic arcade gravity curve that accelerates drop frequency and BGM tempo as your score and cleared lines increase, amplifying tension and excitement.
 - **Dynamic Viewport Scaling**: Responsive CSS and canvas scaling ensure crisp rendering across desktop and mobile screens.
 - **Audio Toolbar & Controls**: Instant mute/unmute toggle, pause/resume, and instant new game resets.
 

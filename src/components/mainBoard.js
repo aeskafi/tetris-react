@@ -33,8 +33,8 @@ let GRID_PIECES = [];
 let LINE_FADES = [];
 
 let TICKS = 0;
-let UPDATE_EVERY = 15;
-let UPDATE_EVERY_CURRENT = 15;
+let UPDATE_EVERY = 16;
+let UPDATE_EVERY_CURRENT = 16;
 let FALLING_SPEED = GRID_SPACE * 0.5;
 let P5_INSTANCE = null;
 
@@ -99,14 +99,15 @@ const MainBoard = () => {
 
     const restartGame = () => {
         sound.playClick();
+        sound.setLevel(1);
         CURRENT_SCORE = 0;
         CURRENT_LEVEL = 1;
         LINES_CLEARED = 0;
         GRID_PIECES = [];
         LINE_FADES = [];
         TICKS = 0;
-        UPDATE_EVERY_CURRENT = 15;
-        UPDATE_EVERY = 15;
+        UPDATE_EVERY_CURRENT = 16;
+        UPDATE_EVERY = 16;
         setGameOver(false);
         setPauseGame(false);
 
@@ -120,7 +121,7 @@ const MainBoard = () => {
         p5.background(BG_COLOR);
         p5.fill(25);
         p5.noStroke();
-        p5.rect(GAME_EDGE_RIGHT, 0, 150, CANVAS_SIZE[0]);
+        p5.rect(GAME_EDGE_RIGHT, 0, 150, CANVAS_SIZE[1]);
 
         p5.fill(BG_COLOR);
         // Score rectangle
@@ -179,7 +180,7 @@ const MainBoard = () => {
         p5.text(LINES_CLEARED, 560, 270);
 
         p5.stroke(DARK_COLOR);
-        p5.line(GAME_EDGE_RIGHT, 0, GAME_EDGE_RIGHT, CANVAS_SIZE[0]);
+        p5.line(GAME_EDGE_RIGHT, 0, GAME_EDGE_RIGHT, CANVAS_SIZE[1]);
     };
 
     const drawLeft = (p5) => {
@@ -500,6 +501,14 @@ const MainBoard = () => {
                     this.pieces[i].pos.y = Math.round(this.pieces[i].pos.y / GRID_SPACE) * GRID_SPACE;
                     GRID_PIECES.push(this.pieces[i]);
                 }
+                CURRENT_SCORE += 10 * CURRENT_LEVEL;
+                if (CURRENT_SCORE > HIGH_SCORE) {
+                    HIGH_SCORE = CURRENT_SCORE;
+                    try {
+                        localStorage.setItem('tetris_high_score', HIGH_SCORE.toString());
+                    } catch (e) {}
+                }
+                updateGameSpeed();
                 analyzeGrid(p5);
                 this.resetPiece(p5);
             };
@@ -536,6 +545,29 @@ const MainBoard = () => {
         return roll;
     }
 
+    function updateGameSpeed() {
+        // Calculate level dynamically from both player score and cleared lines
+        // Level increases every 750 points or every 4 lines cleared
+        const levelFromScore = Math.floor(CURRENT_SCORE / 750) + 1;
+        const levelFromLines = Math.floor(LINES_CLEARED / 4) + 1;
+        CURRENT_LEVEL = Math.max(levelFromScore, levelFromLines);
+
+        // Authentic progressive speed scaling:
+        // Level 1: 16 ticks (~267ms per step)
+        // Level 2: 14 ticks (~233ms)
+        // Level 3: 12 ticks (~200ms)
+        // Level 4: 10 ticks (~167ms)
+        // Level 5: 8 ticks (~133ms)
+        // Level 6: 6 ticks (~100ms)
+        // Level 7: 4 ticks (~67ms)
+        // Level 8+: 2 ticks (~33ms - maximum adrenaline challenge)
+        UPDATE_EVERY_CURRENT = Math.max(2, 16 - (CURRENT_LEVEL - 1) * 2);
+        UPDATE_EVERY = UPDATE_EVERY_CURRENT;
+
+        // Accelerate soundtrack tempo with rising level to enhance tension
+        sound.setLevel(CURRENT_LEVEL);
+    }
+
     function analyzeGrid(p5) {
         // Snap all pieces to grid and count blocks per row Y
         const rowCounts = {};
@@ -562,9 +594,6 @@ const MainBoard = () => {
 
         const linesCount = fullRows.length;
         LINES_CLEARED += linesCount;
-        CURRENT_LEVEL = Math.floor(LINES_CLEARED / 10) + 1;
-        UPDATE_EVERY_CURRENT = Math.max(4, 15 - (CURRENT_LEVEL - 1));
-        UPDATE_EVERY = UPDATE_EVERY_CURRENT;
 
         // Classic arcade score multipliers: 1=100, 2=300, 3=500, 4=800
         const lineScores = [0, 100, 300, 500, 800];
@@ -577,6 +606,8 @@ const MainBoard = () => {
                 localStorage.setItem('tetris_high_score', HIGH_SCORE.toString());
             } catch (e) {}
         }
+
+        updateGameSpeed();
 
         // Trigger flash beam on cleared rows
         for (const rowY of fullRows) {

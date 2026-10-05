@@ -40,6 +40,16 @@ class SoundController {
         }
     }
 
+    setLevel(level) {
+        if (this.bgmAudio) {
+            try {
+                // Dynamically scale music playbackRate from 1.0x up to 1.30x with level
+                const rate = Math.min(1.30, 1.0 + Math.max(0, level - 1) * 0.035);
+                this.bgmAudio.playbackRate = rate;
+            } catch (e) {}
+        }
+    }
+
     toggleMute() {
         this.isMuted = !this.isMuted;
         try {
