@@ -1,17 +1,224 @@
+/* ==========================================================================
+   Tetris 2D Modern Arcade Theme Stylesheet
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 html,
 body {
-  height: 100%;
+  min-height: 100vh;
+  background-color: #0b0f19;
+  color: #f3f4f6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  overflow-x: hidden;
 }
 
 body {
-  margin: 0;
   display: flex;
-
-  /* This centers our sketch horizontally. */
   justify-content: center;
-
-  /* This centers our sketch vertically. */
   align-items: center;
+  padding: 12px 8px;
+}
 
-  background-color: black;
+.tetris-wrapper {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Header & Toolbar
+   -------------------------------------------------------------------------- */
+.tetris-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.brand-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.tetris-title {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #a78bfa 0%, #818cf8 50%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+.tetris-subtitle {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.tetris-toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbar-btn {
+  background: #1f2937;
+  color: #f3f4f6;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(75, 85, 99, 0.4);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toolbar-btn:hover {
+  background: #374151;
+  border-color: #6b7280;
+  transform: translateY(-1px);
+}
+
+.toolbar-btn:active {
+  transform: translateY(1px);
+}
+
+.toolbar-btn.btn-primary {
+  background: #4f46e5;
+  border-color: #6366f1;
+}
+
+.toolbar-btn.btn-primary:hover {
+  background: #6366f1;
+}
+
+/* --------------------------------------------------------------------------
+   Canvas Container
+   -------------------------------------------------------------------------- */
+.canvas-card {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  background: #111827;
+  touch-action: none;
+}
+
+.canvas-card canvas {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Virtual D-Pad (Touch / Mobile)
+   -------------------------------------------------------------------------- */
+.virtual-dpad {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dpad-row {
+  display: flex;
+  gap: 8px;
+}
+
+.dpad-btn {
+  width: 54px;
+  height: 48px;
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid rgba(75, 85, 99, 0.4);
+  border-radius: 8px;
+  font-size: 19px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.1s ease;
+}
+
+.dpad-btn:hover {
+  background: #374151;
+}
+
+.dpad-btn:active {
+  transform: scale(0.92);
+  background: #4f46e5;
+  color: white;
+}
+
+.dpad-btn.drop-btn {
+  background: #7c2d12;
+  color: #fdba74;
+  border-color: #ea580c;
+}
+
+.dpad-btn.drop-btn:active {
+  background: #ea580c;
+  color: white;
+}
+
+/* --------------------------------------------------------------------------
+   Footer Instructions
+   -------------------------------------------------------------------------- */
+.tetris-footer {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+kbd {
+  background: #1f2937;
+  color: #d1d5db;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(75, 85, 99, 0.4);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 8px 4px;
+  }
+
+  .tetris-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .dpad-btn {
+    width: 48px;
+    height: 44px;
+    font-size: 17px;
+  }
 }
